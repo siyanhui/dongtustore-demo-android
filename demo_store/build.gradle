@@ -1,0 +1,50 @@
+apply plugin: 'com.android.application'
+
+/**
+ * 这一处代码的作用是从local.properties中读取初始化SDK所需要的一对AppID和AppSecret。
+ *
+ * ID和Secret可以从SDK的官方网站 http://open.biaoqingmm.com/open/register/index.html 申请获得。
+ *
+ * 申请成功之后，请按照如下格式将它们添加到local.properties中去：
+ *
+ * dtstore.appID=idididididid
+ * dtstore.appSecret=secretsecretsecret
+ */
+Properties properties = new Properties()
+properties.load(project.file('local.properties').newDataInputStream())
+def dtstoreAppID = properties.getProperty('dtstore.appID')
+def dtstoreAppSecret = properties.getProperty('dtstore.appSecret')
+
+android {
+    repositories {
+        jcenter()
+    }
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 28
+        applicationId 'com.dongtu.store.demo'
+        /**
+         * 以下代码将上面读取到的dtstoreAppID和dtstoreAppSecret写入AndroidManifest
+         */
+        manifestPlaceholders = [dtstoreAppID: dtstoreAppID, dtstoreAppSecret: dtstoreAppSecret]
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFile("proguard-rules.txt")
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation project(':DongtuStoreSDK')
+}

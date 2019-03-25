@@ -1,0 +1,7 @@
+-keep class com.melink.**{*;}
+-keep class com.dongtu.**{*;}
+-dontwarn com.melink.**
+-dontwarn com.dongtu.**
+-dontwarn com.android.**
+-dontwarn android.**
+-dontwarn androidx.**
