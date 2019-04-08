@@ -64,6 +64,8 @@ DongtuStore.destroy()
 
 开发者可以根据情况选择是加载一次单例之后让它常驻内存，还是在Activity的onCreate()和onDestroy()中进行它的加载和销毁。但需要注意的是，如果在onCreate()中进行的单例的加载，请不要在onPause()中进行单例销毁，否则会引发问题。
 
+另外需要特别注意的是，SDK提供的控件有可能会在初始化时调用`DongtuStoreSDK`的功能。如果在xml布局中使用了`DTStoreKeyboard`、`DTStoreEditView`等控件，那么在使用xml生成View之前（包括inflate、setContentView等操作），必须确保已经调用了load()，否则会引发闪退。
+
 ### 2. 传入UI组件
 
 加载单例之后，需要调用方法传入一些UI组件。`DongtuStore`会给这些组件加上必要的Listener、填充数据。

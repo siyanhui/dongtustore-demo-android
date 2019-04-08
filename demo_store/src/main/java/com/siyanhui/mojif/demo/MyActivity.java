@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -143,6 +142,8 @@ public class MyActivity extends FragmentActivity {
                         adapter.refresh(datas);
                     }
                 }, 1000);
+
+                hideDTStoreKeyboard();
             }
         });
         initMessageInputToolBox();
@@ -154,29 +155,21 @@ public class MyActivity extends FragmentActivity {
         mEditView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                if (mPendingShowPlaceHolder) {
-                    // 在设置mPendingShowPlaceHolder时已经调用了隐藏Keyboard的方法，直到Keyboard隐藏前都取消重绘
-                    if (isKeyboardVisible()) {
-                        ViewGroup.LayoutParams params = mKeyboard.getLayoutParams();
-                        int distance = getDistanceFromInputToBottom();
-                        // 调整PlaceHolder高度
-                        if (distance > DISTANCE_SLOP && distance != params.height) {
-                            params.height = distance;
-                            mKeyboard.setLayoutParams(params);
-                            getPreferences(MODE_PRIVATE).edit().putInt(LAST_KEYBOARD_HEIGHT, distance).apply();
+                if (mEditView.isFocused()) {
+                    if (mPendingShowPlaceHolder) {
+                        // 在设置mPendingShowPlaceHolder时已经调用了隐藏Keyboard的方法，直到Keyboard隐藏前都取消重绘
+                        if (!isKeyboardVisible()) {
+                            mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
+                            showDTStoreKeyboard();
+                            mPendingShowPlaceHolder = false;
                         }
                         return false;
                     } else {
-                        mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
-                        showDTStoreKeyboard();
-                        mPendingShowPlaceHolder = false;
-                        return false;
-                    }
-                } else {
-                    if (isDTStoreKeyboardVisible() && isKeyboardVisible()) {
-                        mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
-                        hideDTStoreKeyboard();
-                        return false;
+                        if (isDTStoreKeyboardVisible() && isKeyboardVisible()) {
+                            mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
+                            hideDTStoreKeyboard();
+                            return false;
+                        }
                     }
                 }
                 return true;

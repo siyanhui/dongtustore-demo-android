@@ -84,7 +84,6 @@ public class ChatAdapter extends BaseAdapter {
             holder.tv_date = v.findViewById(R.id.chat_item_date);
             holder.message = v.findViewById(R.id.chat_item_content_message);
             holder.message.setStickerSize(dip2px(150));
-            holder.message.setEmojiSize(dip2px(20));
             holder.message.setUnicodeEmojiSpanSizeRatio(1.5f);//让emoji显示得比一般字符大一点
             holder.dtImageView = v.findViewById(R.id.chat_item_content_dt_image);
             v.setTag(holder);
@@ -98,7 +97,7 @@ public class ChatAdapter extends BaseAdapter {
         if (dataType == Message.Type.GIF) {
             holder.message.setVisibility(View.GONE);
             holder.dtImageView.setVisibility(View.VISIBLE);
-            DongtuStore.loadImageInto(holder.dtImageView, data.getContent(), data.getImageId(), data.getWidth(), data.getHeight());
+            DongtuStore.loadImageInto(holder.dtImageView, data.getContent(), data.getImageId(), dip2px(150), dip2px(150));
         } else {
             holder.dtImageView.setVisibility(View.GONE);
             holder.message.setVisibility(View.VISIBLE);
