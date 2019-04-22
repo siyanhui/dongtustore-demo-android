@@ -20,6 +20,7 @@ import com.dongtu.sdk.constant.DTGender;
 import com.dongtu.sdk.model.DTImage;
 import com.dongtu.store.DongtuStore;
 import com.dongtu.store.visible.messaging.DTStoreSendMessageListener;
+import com.dongtu.store.visible.messaging.DTStoreSticker;
 import com.dongtu.store.visible.ui.DTStoreUnicodeEmojiDrawableProvider;
 import com.dongtu.store.widget.DTStoreEditView;
 import com.dongtu.store.widget.DTStoreKeyboard;
@@ -36,7 +37,7 @@ public class MyActivity extends FragmentActivity {
     private ListView mRealListView;
     private ChatAdapter adapter;
     private View inputbox;
-    private CheckBox mKeyboardOpen;
+    private CheckBox mKeyboardSwich;
     private DTStoreEditView mEditView;
     /**
      * 键盘切换相关
@@ -62,7 +63,7 @@ public class MyActivity extends FragmentActivity {
         mRealListView = findViewById(R.id.chat_listview);
         mRealListView.setSelector(android.R.color.transparent);
         final Button sendButton = findViewById(R.id.chatbox_send);
-        mKeyboardOpen = findViewById(R.id.chatbox_open);
+        mKeyboardSwich = findViewById(R.id.chatbox_open);
         mEditView = findViewById(R.id.chatbox_message);
         mEditView.setUnicodeEmojiSpanSizeRatio(1.5f);//让emoji显示得比一般字符大一点
         mEditView.requestFocus();
@@ -81,7 +82,7 @@ public class MyActivity extends FragmentActivity {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                mKeyboardOpen.setChecked(false);
+                mKeyboardSwich.setChecked(false);
                 return false;
             }
         });
@@ -109,8 +110,8 @@ public class MyActivity extends FragmentActivity {
         DongtuStore.setSendMessageListener(new DTStoreSendMessageListener() {
 
             @Override
-            public void onSendSticker(final String code) {
-                Message message = new Message(Message.Type.STICKER, "Tom", "Jerry", code, true, new Date(), null);
+            public void onSendSticker(final DTStoreSticker sticker) {
+                Message message = new Message(Message.Type.STICKER, "Tom", "Jerry", sticker.code, true, new Date(), null);
                 datas.add(message);
                 adapter.refresh(datas);
 
@@ -119,7 +120,7 @@ public class MyActivity extends FragmentActivity {
                  */
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
-                        Message getmessage = new Message(Message.Type.STICKER, "Jerry", "Tom", code, false, new Date(), null);
+                        Message getmessage = new Message(Message.Type.STICKER, "Jerry", "Tom", sticker.code, false, new Date(), null);
                         datas.add(getmessage);
                         adapter.refresh(datas);
                     }
@@ -143,7 +144,7 @@ public class MyActivity extends FragmentActivity {
                     }
                 }, 1000);
 
-                hideDTStoreKeyboard();
+                closeKeyboard();
             }
         });
         initMessageInputToolBox();
@@ -155,29 +156,28 @@ public class MyActivity extends FragmentActivity {
         mEditView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                if (mEditView.isFocused()) {
+                if (!isKeyboardVisible()) {
+                    // 在设置mPendingShowPlaceHolder时已经调用了隐藏Keyboard的方法，取消重绘
                     if (mPendingShowPlaceHolder) {
-                        // 在设置mPendingShowPlaceHolder时已经调用了隐藏Keyboard的方法，直到Keyboard隐藏前都取消重绘
-                        if (!isKeyboardVisible()) {
-                            mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
-                            showDTStoreKeyboard();
-                            mPendingShowPlaceHolder = false;
-                        }
+                        mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
+                        showDTStoreKeyboard();
+                        mPendingShowPlaceHolder = false;
                         return false;
-                    } else {
-                        if (isDTStoreKeyboardVisible() && isKeyboardVisible()) {
-                            mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
-                            hideDTStoreKeyboard();
-                            return false;
-                        }
                     }
+                } else if (isDTStoreKeyboardVisible()) {
+                    mRealListView.setSelection(mRealListView.getAdapter().getCount() - 1);
+                    hideDTStoreKeyboard();
+                    if (!mEditView.isFocused()) {
+                        mPendingShowPlaceHolder = true;
+                    }
+                    return false;
                 }
                 return true;
             }
         });
 
         //切换开关
-        mKeyboardOpen.setOnClickListener(new View.OnClickListener() {
+        mKeyboardSwich.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 除非软键盘和PlaceHolder全隐藏时直接显示PlaceHolder，其他情况此处处理软键盘，onPreDrawListener处理PlaceHolder
@@ -205,17 +205,17 @@ public class MyActivity extends FragmentActivity {
     /**************************
      * 表情键盘软键盘切换相关 start
      **************************************/
-    private void closebroad() {
+    private void closeKeyboard() {
         if (isDTStoreKeyboardVisible()) {
             hideDTStoreKeyboard();
-        } else if (isKeyboardVisible()) {
+        }
+        if (isKeyboardVisible()) {
             hideSoftInput(mEditView);
         }
     }
 
     private boolean isKeyboardVisible() {
-        return (getDistanceFromInputToBottom() > DISTANCE_SLOP && !isDTStoreKeyboardVisible())
-                || (getDistanceFromInputToBottom() > (mKeyboard.getHeight() + DISTANCE_SLOP) && isDTStoreKeyboardVisible());
+        return (getDistanceFromInputToBottom() > DISTANCE_SLOP && !isDTStoreKeyboardVisible()) || (getDistanceFromInputToBottom() > (mKeyboard.getHeight() + DISTANCE_SLOP) && isDTStoreKeyboardVisible());
     }
 
     private void showSoftInput(View view) {
@@ -302,7 +302,7 @@ public class MyActivity extends FragmentActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if ((isDTStoreKeyboardVisible() || isKeyboardVisible())) {
-                closebroad();
+                closeKeyboard();
             }
             return true;
         } else {
@@ -320,8 +320,8 @@ public class MyActivity extends FragmentActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // 关闭键盘
-                mKeyboardOpen.setChecked(false);
-                closebroad();
+                mKeyboardSwich.setChecked(false);
+                closeKeyboard();
                 return false;
             }
         };

@@ -1,3 +1,7 @@
+<link rel="stylesheet" href="../../../custom/css/app.css">
+<script src="../../../custom/js/app.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 # 类和开放接口
 
 ----------------
@@ -158,13 +162,13 @@ public void setStickerSize(int size)
 * 显示大表情。
 
 ```java
-public void showSticker(DTStoreMessage data)
+public void showSticker(String code)
 ```
 
 * 显示文本消息。
 
 ```java
-public void showMessage(DTStoreMessage data)
+public void showText(String text)
 ```
 
 * 设置Emoji相对于普通字符显示大小的比例（仅对DTStoreUnicodeEmojiDrawableProvider提供了图片的Emoji有效）。
@@ -185,10 +189,10 @@ public void setConflictSpanClasses(Class[] classes)
 
 表情消息发送监听接口。
 
-* 发送单个表情
+* 发送大表情
 
 ```java
-void onSendSticker(String code)
+void onSendSticker(DTStoreSticker sticker)
 ```
 
 * 发送动图Gif

@@ -87,7 +87,7 @@ DongtuStore.setupSearchPopupAboveView(anchorView, editView);
 
 ### 4. 设置消息发送回调
 
-开发者需要设置回调来处理三种通过`DongtuStore`发送的消息，并对消息进行封装和发送。这里演示的是将消息封装为JSON的方法。
+开发者需要设置回调来处理两种通过`DongtuStore`发送的消息，并对消息进行封装和发送。这里演示的是将消息封装为JSON的方法。
 
 ```java
 DongtuStore.setSendMessageListener(new DTStoreSendMessageListener() {
@@ -95,10 +95,10 @@ DongtuStore.setSendMessageListener(new DTStoreSendMessageListener() {
      * 在表情键盘中点击表情发送的消息
      */
     @Override
-    public void onSendSticker(String code) {
+    public void onSendSticker(DTStoreSticker sticker) {
         JSONArray messageData = new JSONArray();
         JSONArray messageItem = new JSONArray();
-        messageItem.put(code);
+        messageItem.put(sticker.code);
         messageItem.put(2);
         messageData.put(messageItem);
         sendMessage(messageData);
