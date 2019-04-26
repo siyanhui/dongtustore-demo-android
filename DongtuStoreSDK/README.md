@@ -165,4 +165,12 @@ DongtuStore.loadImageInto(dtImageView, image, id, width, height);
 
 ### 7. UI定制
 
-SDK对部分UI提供了定制。开发者如果需要更改颜色，可以修改`dtstore_color.xml`中的相应值，如果需要更改控件大小，可以修改`dtstore_dimens.xml`中的相应值
+SDK对部分UI提供了定制。
+
+对于表情商店等界面，开发者如果需要更改颜色，可以修改`dtstore_color.xml`中的相应值，如果需要更改控件大小，可以修改`dtstore_dimens.xml`中的相应值。
+
+对于展示商店表情消息的控件`DTStoreMessageView`，可以通过style来设置其中文本的样式，具体方法在类和开放接口文档中有详细描述。
+
+### 8. proguard配置
+
+参见[Demo中的proguard-rules.txt](https://github.com/siyanhui/dongtustore-demo-android/blob/master/demo_store/proguard-rules.txt)
