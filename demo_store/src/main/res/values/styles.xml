@@ -17,4 +17,12 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="DTStoreMessageViewSent">
+        <item name="android:textColor">#ff000000</item>
+    </style>
+
+    <style name="DTStoreMessageViewReceived">
+        <item name="android:textColor">#ff909090</item>
+    </style>
+
 </resources>

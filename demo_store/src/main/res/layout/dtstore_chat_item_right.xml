@@ -35,7 +35,7 @@
             android:layout_toLeftOf="@id/chat_item_avatar"
             android:paddingRight="15dip">
 
-            <com.dongtu.store.widget.DTStoreMessageView
+            <FrameLayout
                 android:id="@+id/chat_item_content_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

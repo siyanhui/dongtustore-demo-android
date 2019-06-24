@@ -2,10 +2,12 @@ package com.siyanhui.mojif.demo;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -83,8 +85,26 @@ public class ChatAdapter extends BaseAdapter {
                     .findViewById(R.id.chat_item_progress);
             holder.tv_date = v.findViewById(R.id.chat_item_date);
             holder.message = v.findViewById(R.id.chat_item_content_message);
-            holder.message.setStickerSize(dip2px(150));
-            holder.message.setUnicodeEmojiSpanSizeRatio(1.5f);//让emoji显示得比一般字符大一点
+            /*
+            示例用这种方法给发送的和接收的消息框应用不同style
+             */
+            if (data.getIsSend()) {
+                holder.messageView = new DTStoreMessageView(context, R.style.DTStoreMessageViewSent);
+            } else {
+                holder.messageView = new DTStoreMessageView(context, R.style.DTStoreMessageViewReceived);
+            }
+            /*
+            DTStoreMessageView可以设置OnClickListener
+             */
+            holder.messageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("DTStore", "Message clicked.");
+                }
+            });
+            holder.messageView.setStickerSize(dip2px(150));
+            holder.messageView.setUnicodeEmojiSpanSizeRatio(1.5f);//让emoji显示得比一般字符大一点
+            holder.message.addView(holder.messageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             holder.dtImageView = v.findViewById(R.id.chat_item_content_dt_image);
             v.setTag(holder);
         } else {
@@ -97,16 +117,17 @@ public class ChatAdapter extends BaseAdapter {
         if (dataType == Message.Type.GIF) {
             holder.message.setVisibility(View.GONE);
             holder.dtImageView.setVisibility(View.VISIBLE);
-            DongtuStore.loadImageInto(holder.dtImageView, data.getContent(), data.getImageId(), dip2px(150), dip2px(150));
+            int dp150 = dip2px(150);
+            DongtuStore.loadImageInto(holder.dtImageView, data.getContent(), data.getImageId(), dp150, Math.round(data.getHeight() * (float) dp150 / data.getWidth()));
         } else {
             holder.dtImageView.setVisibility(View.GONE);
             holder.message.setVisibility(View.VISIBLE);
             if (dataType == Message.Type.STICKER) {
                 holder.message.getBackground().setAlpha(0);
-                holder.message.showSticker(data.getContent());
+                holder.messageView.showSticker(data.getContent());
             } else {
                 holder.message.getBackground().setAlpha(255);
-                holder.message.showText(data.getContent());
+                holder.messageView.showText(data.getContent());
             }
         }
         return v;
@@ -121,7 +142,8 @@ public class ChatAdapter extends BaseAdapter {
         TextView tv_date;
         ImageView img_sendfail;
         ProgressBar progress;
-        DTStoreMessageView message;
+        FrameLayout message;
+        DTStoreMessageView messageView;
         DTImageView dtImageView;
     }
 }

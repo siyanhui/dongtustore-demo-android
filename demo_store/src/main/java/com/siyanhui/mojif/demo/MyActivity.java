@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -51,12 +52,17 @@ public class MyActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DongtuStore.setUserInfo("0001", "Tester", DTGender.MALE, "301, No.99, Yandang Road, Shanghai", "xxx@dongtu.com", "12312312345", null);
-        DongtuStore.load();
         setContentView(R.layout.dtstore_myactivity_chat);
         initView();
     }
 
     private void initView() {
+        findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         inputbox = findViewById(R.id.messageToolBox);
         mMainContainer = findViewById(R.id.main_container);
         mKeyboard = findViewById(R.id.chat_msg_input_box);
@@ -90,21 +96,23 @@ public class MyActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 final String content = mEditView.getText().toString();
-                Message message = new Message(Message.Type.TEXT, "Tom", "Jerry", content, true, new Date(), null);
-                datas.add(message);
-                adapter.refresh(datas);
-                mEditView.setText(null);
+                if (!TextUtils.isEmpty(content)) {
+                    Message message = new Message(Message.Type.TEXT, "Tom", "Jerry", content, true, new Date(), null);
+                    datas.add(message);
+                    adapter.refresh(datas);
+                    mEditView.setText(null);
 
-                /*
-                 * 1秒后增加一条和发出的这条相同的消息，模拟对话
-                 */
-                new Handler().postDelayed(new Runnable() {
-                    public void run() {
-                        Message getmessage = new Message(Message.Type.TEXT, "Jerry", "Tom", content, false, new Date(), null);
-                        datas.add(getmessage);
-                        adapter.refresh(datas);
-                    }
-                }, 1000);
+                    /*
+                     * 1秒后增加一条和发出的这条相同的消息，模拟对话
+                     */
+                    new Handler().postDelayed(new Runnable() {
+                        public void run() {
+                            Message getmessage = new Message(Message.Type.TEXT, "Jerry", "Tom", content, false, new Date(), null);
+                            datas.add(getmessage);
+                            adapter.refresh(datas);
+                        }
+                    }, 1000);
+                }
             }
         });
         DongtuStore.setSendMessageListener(new DTStoreSendMessageListener() {
@@ -143,8 +151,7 @@ public class MyActivity extends FragmentActivity {
                         adapter.refresh(datas);
                     }
                 }, 1000);
-
-                closeKeyboard();
+                mEditView.setText(null);
             }
         });
         initMessageInputToolBox();
@@ -303,11 +310,10 @@ public class MyActivity extends FragmentActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if ((isDTStoreKeyboardVisible() || isKeyboardVisible())) {
                 closeKeyboard();
+                return true;
             }
-            return true;
-        } else {
-            return super.onKeyDown(keyCode, event);
         }
+        return super.onKeyDown(keyCode, event);
     }
 
 
