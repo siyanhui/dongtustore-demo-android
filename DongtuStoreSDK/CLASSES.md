@@ -80,6 +80,18 @@ public static void setUnicodeEmojiSet(Object[] unicodes)
 public static void setUnicodeEmojiTabIconProvider(DTStoreSendMessageListener provider)
 ```
 
+* 自定义Gif键盘的部分样式
+
+```java
+public static void setGifKeyboardConfigProvider(DTGifKeyboardConfigProvider provider)
+```
+
+* 自定义收藏管理界面的部分样式
+
+```java
+public static void setCollectionManagerConfigProvider(DTStoreCollectionManagerConfigProvider provider)
+```
+
 * 展示动图
 
 ```java
@@ -90,6 +102,30 @@ public static void loadImageInto(DTImageView imageView, final String image, fina
 
 ```java
 public static void showDongtuPopup(Activity activity)
+```
+
+* 判断商店表情是否已收藏
+
+```java
+public static void collectionHasSticker(String code, CollectionExistsCallback callback)
+```
+
+* 收藏商店表情
+
+```java
+public static void collectSticker(String code, DTOutcomeListener listener)
+```
+
+* 判断动图是否已收藏
+
+```java
+public static void collectionHasGif(String code, CollectionExistsCallback callback)
+```
+
+* 收藏动图表情
+
+```java
+public static void collectGif(String id, DTOutcomeListener listener)
 ```
 
 ## UI定制相关类
@@ -111,6 +147,14 @@ Drawable getDrawableFromCodePoint(int codePoint);
 ```java
 Drawable getIcon();
 ```
+
+### DTGifKeyboardConfigProvider
+
+实现这个接口的类，可以定义Gif键盘中的热词标签和搜索文字输入框的字体、颜色、边框等UI样式。
+
+### DTStoreCollectionManagerConfigProvider
+
+实现这个接口的类，可以定义收藏管理界面下方两个按钮的字体颜色。
 
 ## UI控件
 

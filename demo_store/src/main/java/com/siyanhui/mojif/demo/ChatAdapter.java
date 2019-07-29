@@ -12,8 +12,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.dongtu.sdk.visible.DTOutcomeListener;
 import com.dongtu.sdk.widget.DTImageView;
 import com.dongtu.store.DongtuStore;
+import com.dongtu.store.visible.callback.CollectionExistsCallback;
 import com.dongtu.store.widget.DTStoreMessageView;
 
 import java.text.SimpleDateFormat;
@@ -119,12 +121,66 @@ public class ChatAdapter extends BaseAdapter {
             holder.dtImageView.setVisibility(View.VISIBLE);
             int dp150 = dip2px(150);
             DongtuStore.loadImageInto(holder.dtImageView, data.getContent(), data.getImageId(), dp150, Math.round(data.getHeight() * (float) dp150 / data.getWidth()));
+            holder.dtImageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    DongtuStore.collectionHasGif(data.getImageId(), new CollectionExistsCallback() {
+                        @Override
+                        public void onSuccess(boolean isExistent) {
+                            DongtuStore.collectGif(data.getImageId(), new DTOutcomeListener() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.i("DongtuStore", "Gif collected");
+                                }
+
+                                @Override
+                                public void onFailure(int errorCode, String reason) {
+                                    Log.i("DongtuStore", "Gif not collected");
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(int errorCode, String reason) {
+                            Log.i("DongtuStore", "Gif in collection: unknown");
+                        }
+                    });
+                    return true;
+                }
+            });
         } else {
             holder.dtImageView.setVisibility(View.GONE);
             holder.message.setVisibility(View.VISIBLE);
             if (dataType == Message.Type.STICKER) {
                 holder.message.getBackground().setAlpha(0);
                 holder.messageView.showSticker(data.getContent());
+                holder.messageView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        DongtuStore.collectionHasSticker(data.getContent(), new CollectionExistsCallback() {
+                            @Override
+                            public void onSuccess(boolean isExistent) {
+                                DongtuStore.collectSticker(data.getContent(), new DTOutcomeListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.i("DongtuStore", "Sticker collected");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String reason) {
+                                        Log.i("DongtuStore", "Sticker not collected");
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(int errorCode, String reason) {
+                                Log.e("DongtuStore", "Sticker in collection: unknown");
+                            }
+                        });
+                        return true;
+                    }
+                });
             } else {
                 holder.message.getBackground().setAlpha(255);
                 holder.messageView.showText(data.getContent());

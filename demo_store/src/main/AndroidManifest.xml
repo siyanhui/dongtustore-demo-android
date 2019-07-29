@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.siyanhui.mojif.demo"
-    android:versionCode="4"
-    android:versionName="2.0.2">
+    android:versionCode="5"
+    android:versionName="3.1">
     <!-- 读写权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- 网络权限 -->

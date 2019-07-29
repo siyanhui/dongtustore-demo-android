@@ -48,23 +48,19 @@ DongtuStore.setUserInfo(USER_ID, USER_NAME, USER_GENDER, USER_ADDRESS, USER_EMAI
 
 ### 1. 单例的加载与销毁
 
-`DongtuStore`在使用时，会有一个单例一直存在于内存中。开发者需要对单例的生命周期进行管理。
+`DongtuStore`在使用时，会有一个单例一直存在于内存中。单例的加载和销毁由SDK内部处理，开发者不需要特别关心。
 
-使用前加载单例：
+但如果有需要的话，也可以在合适的时机预先加载，避免冷启动，加快响应速度：
 
 ```java
 DongtuStore.load()
 ```
 
-使用后销毁单例：
+在有一段时间不会用到SDk时，可以按需销毁单例，节省一些内存：
 
 ```java
 DongtuStore.destroy()
 ```
-
-开发者可以根据情况选择是加载一次单例之后让它常驻内存，还是在Activity的onCreate()和onDestroy()中进行它的加载和销毁。但需要注意的是，如果在onCreate()中进行的单例的加载，请不要在onPause()中进行单例销毁，否则会引发问题。
-
-另外需要特别注意的是，SDK提供的控件有可能会在初始化时调用`DongtuStoreSDK`的功能。如果在xml布局中使用了`DTStoreKeyboard`、`DTStoreEditView`等控件，那么在使用xml生成View之前（包括inflate、setContentView等操作），必须确保已经调用了load()，否则会引发闪退。
 
 ### 2. 传入UI组件
 
@@ -162,6 +158,16 @@ DongtuStore.loadImageInto(dtImageView, image, id, width, height);
     * width（int，由`DTImage.getWidth()`获得）
     * height（int，由`DTImage.getHeight()`获得）
     * isAnimated（int，0代表否，1代表是，由`DTImage.isAnimated()`获得，iOS需要）
+
+### 7. 表情收藏
+
+SDK从3.1版本开始提供了表情收藏功能，无论是商店中提供的表情还是搜索UI提供的Gif，都可以由用户加入收藏。开发者只需做两件事请：
+
+* 在需要收藏的时候，调用`collectionHasSticker`、`collectSticker`、`collectionHasGif`、`collectGif`这几个接口；
+
+* 在调用`setUserInfo`时，给每个用户提供一个唯一的UserId。
+
+一个用户收藏的表情可以在键盘中的“收藏”tab查看并发送，在该tab中还有一个收藏管理按钮，点击之后出现的界面中可以对收藏内容进行删除和排序。
 
 ### 7. UI定制
 
