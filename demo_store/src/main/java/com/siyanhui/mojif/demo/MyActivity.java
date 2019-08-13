@@ -51,7 +51,9 @@ public class MyActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DongtuStore.setUserInfo("0001", "Tester", DTGender.MALE, "301, No.99, Yandang Road, Shanghai", "xxx@dongtu.com", "12312312345", null);
+        DongtuStore.setUserInfo("00001", "Tester", DTGender.MALE, "301, No.99, Yandang Road, Shanghai", "xxx@dongtu.com", "12312312345", null);
+//        DongtuStore.load();
+//        DongtuStore.destroy();
         setContentView(R.layout.dtstore_myactivity_chat);
         initView();
     }
