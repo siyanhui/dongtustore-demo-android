@@ -20,7 +20,7 @@ android {
         jcenter()
     }
     compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.2'
 
     packagingOptions {
         exclude 'META-INF/ASL2.0'
@@ -35,6 +35,10 @@ android {
          * 以下代码将上面读取到的dtstoreAppID和dtstoreAppSecret写入AndroidManifest
          */
         manifestPlaceholders = [dtstoreAppID: dtstoreAppID, dtstoreAppSecret: dtstoreAppSecret]
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -25,34 +24,36 @@ import java.util.List;
 import java.util.Locale;
 
 public class ChatAdapter extends BaseAdapter {
-    private Context context;
-    private List<Message> datas;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+    private final Context mContext;
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+    private List<Message> mMessages;
 
-    ChatAdapter(Context context, List<Message> datas) {
-        this.context = context;
-        if (datas == null) {
-            datas = new ArrayList<>(0);
+    ChatAdapter(Context context, List<Message> messages) {
+        this.mContext = context;
+        if (messages == null) {
+            mMessages = new ArrayList<>(0);
+        } else {
+            mMessages = messages;
         }
-        this.datas = datas;
     }
 
-    void refresh(List<Message> datas) {
-        if (datas == null) {
-            datas = new ArrayList<>(0);
+    void refresh(List<Message> messages) {
+        if (messages == null) {
+            mMessages = new ArrayList<>(0);
+        } else {
+            mMessages = messages;
         }
-        this.datas = datas;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return datas.size();
+        return mMessages.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return datas.get(position);
+        return mMessages.get(position);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class ChatAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return datas.get(position).getIsSend() ? 1 : 0;
+        return mMessages.get(position).getIsSend() ? 1 : 0;
     }
 
     @Override
@@ -73,61 +74,50 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View v, ViewGroup parent) {
         final ViewHolder holder;
-        final Message data = datas.get(position);
+        final Message message = mMessages.get(position);
         if (v == null) {
             holder = new ViewHolder();
-            if (data.getIsSend()) {
-                v = View.inflate(context, R.layout.dtstore_chat_item_right, null);
+
+            //示例：给发送的和接收的消息框应用不同style
+            if (message.getIsSend()) {
+                v = View.inflate(mContext, R.layout.dtstore_chat_item_right, null);
+                holder.messageView = new DTStoreMessageView(mContext, R.style.DTStoreMessageViewSent);
             } else {
-                v = View.inflate(context, R.layout.dtstore_chat_item_left, null);
+                v = View.inflate(mContext, R.layout.dtstore_chat_item_left, null);
+                holder.messageView = new DTStoreMessageView(mContext, R.style.DTStoreMessageViewReceived);
             }
-            holder.img_sendfail = v
-                    .findViewById(R.id.chat_item_fail);
-            holder.progress = v
-                    .findViewById(R.id.chat_item_progress);
+
+            //DTStoreMessageView可以设置OnClickListener
+            holder.messageView.setOnClickListener(view -> Log.i("DTStore", "Message clicked."));
+            holder.messageView.setStickerSize(dp150());
+            //让emoji显示得比一般字符大一点
+            holder.messageView.setUnicodeEmojiSpanSizeRatio(1.5f);
+
+            holder.progress = v.findViewById(R.id.chat_item_progress);
             holder.tv_date = v.findViewById(R.id.chat_item_date);
-            holder.message = v.findViewById(R.id.chat_item_content_message);
-            /*
-            示例用这种方法给发送的和接收的消息框应用不同style
-             */
-            if (data.getIsSend()) {
-                holder.messageView = new DTStoreMessageView(context, R.style.DTStoreMessageViewSent);
-            } else {
-                holder.messageView = new DTStoreMessageView(context, R.style.DTStoreMessageViewReceived);
-            }
-            /*
-            DTStoreMessageView可以设置OnClickListener
-             */
-            holder.messageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("DTStore", "Message clicked.");
-                }
-            });
-            holder.messageView.setStickerSize(dip2px(150));
-            holder.messageView.setUnicodeEmojiSpanSizeRatio(1.5f);//让emoji显示得比一般字符大一点
-            holder.message.addView(holder.messageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            holder.messageContainer = v.findViewById(R.id.chat_item_content_message);
+            holder.messageContainer.addView(holder.messageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             holder.dtImageView = v.findViewById(R.id.chat_item_content_dt_image);
             v.setTag(holder);
         } else {
             holder = (ViewHolder) v.getTag();
         }
+
         holder.tv_date.setText(simpleDateFormat.format(new Date()));
         holder.tv_date.setVisibility(View.VISIBLE);
-
-        Message.Type dataType = data.getType();
+        Message.Type dataType = message.getType();
         if (dataType == Message.Type.GIF) {
-            holder.message.setVisibility(View.GONE);
+            holder.messageContainer.setVisibility(View.GONE);
             holder.dtImageView.setVisibility(View.VISIBLE);
-            int dp150 = dip2px(150);
-            DongtuStore.loadImageInto(holder.dtImageView, data.getContent(), data.getImageId(), dp150, Math.round(data.getHeight() * (float) dp150 / data.getWidth()));
-            holder.dtImageView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    DongtuStore.collectionHasGif(data.getImageId(), new CollectionExistsCallback() {
-                        @Override
-                        public void onSuccess(boolean isExistent) {
-                            DongtuStore.collectGif(data.getImageId(), new DTOutcomeListener() {
+            int dp150 = dp150();
+            DongtuStore.loadImageInto(holder.dtImageView, message.getContent(), message.getImageId(), dp150, Math.round(message.getHeight() * (float) dp150 / message.getWidth()));
+            //简单实现Gif的收藏操作。长按消息列表中的Gif时，如果它没有被收藏，则调用收藏接口，否则调用取消收藏接口。
+            holder.dtImageView.setOnLongClickListener(view -> {
+                DongtuStore.collectionHasGif(message.getImageId(), new CollectionExistsCallback() {
+                    @Override
+                    public void onSuccess(boolean isExistent) {
+                        if (!isExistent) {
+                            DongtuStore.collectGif(message.getImageId(), new DTOutcomeListener() {
                                 @Override
                                 public void onSuccess() {
                                     Log.i("DongtuStore", "Gif collected");
@@ -138,29 +128,41 @@ public class ChatAdapter extends BaseAdapter {
                                     Log.i("DongtuStore", "Gif not collected");
                                 }
                             });
-                        }
+                        } else {
+                            DongtuStore.removeCollectedGif(message.getImageId(), new DTOutcomeListener() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.i("DongtuStore", "Gif removed from collection");
+                                }
 
-                        @Override
-                        public void onFailure(int errorCode, String reason) {
-                            Log.i("DongtuStore", "Gif in collection: unknown");
+                                @Override
+                                public void onFailure(int errorCode, String reason) {
+                                    Log.i("DongtuStore", "Gif not removed from collection");
+                                }
+                            });
                         }
-                    });
-                    return true;
-                }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String reason) {
+                        Log.i("DongtuStore", "Gif in collection: unknown");
+                    }
+                });
+                return true;
             });
         } else {
             holder.dtImageView.setVisibility(View.GONE);
-            holder.message.setVisibility(View.VISIBLE);
+            holder.messageContainer.setVisibility(View.VISIBLE);
             if (dataType == Message.Type.STICKER) {
-                holder.message.getBackground().setAlpha(0);
-                holder.messageView.showSticker(data.getContent());
-                holder.messageView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        DongtuStore.collectionHasSticker(data.getContent(), new CollectionExistsCallback() {
-                            @Override
-                            public void onSuccess(boolean isExistent) {
-                                DongtuStore.collectSticker(data.getContent(), new DTOutcomeListener() {
+                holder.messageContainer.getBackground().setAlpha(0);
+                holder.messageView.showSticker(message.getContent());
+                //与Gif类似，简单实现Sticker的收藏操作。
+                holder.messageView.setOnLongClickListener(view -> {
+                    DongtuStore.collectionHasSticker(message.getContent(), new CollectionExistsCallback() {
+                        @Override
+                        public void onSuccess(boolean isExistent) {
+                            if (!isExistent) {
+                                DongtuStore.collectSticker(message.getContent(), new DTOutcomeListener() {
                                     @Override
                                     public void onSuccess() {
                                         Log.i("DongtuStore", "Sticker collected");
@@ -171,34 +173,45 @@ public class ChatAdapter extends BaseAdapter {
                                         Log.i("DongtuStore", "Sticker not collected");
                                     }
                                 });
-                            }
+                            } else {
+                                DongtuStore.removeCollectedSticker(message.getContent(), new DTOutcomeListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.i("DongtuStore", "Sticker removed from Collection");
+                                    }
 
-                            @Override
-                            public void onFailure(int errorCode, String reason) {
-                                Log.e("DongtuStore", "Sticker in collection: unknown");
+                                    @Override
+                                    public void onFailure(int errorCode, String reason) {
+                                        Log.i("DongtuStore", "Sticker not removed from Collection");
+                                    }
+                                });
                             }
-                        });
-                        return true;
-                    }
+                        }
+
+                        @Override
+                        public void onFailure(int errorCode, String reason) {
+                            Log.e("DongtuStore", "Sticker in collection: unknown");
+                        }
+                    });
+                    return true;
                 });
             } else {
-                holder.message.getBackground().setAlpha(255);
-                holder.messageView.showText(data.getContent());
+                holder.messageContainer.getBackground().setAlpha(255);
+                holder.messageView.showText(message.getContent());
             }
         }
         return v;
     }
 
-    private int dip2px(float dp) {
-        Resources r = context.getResources();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    private int dp150() {
+        Resources r = mContext.getResources();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) 150, r.getDisplayMetrics());
     }
 
     static class ViewHolder {
         TextView tv_date;
-        ImageView img_sendfail;
         ProgressBar progress;
-        FrameLayout message;
+        FrameLayout messageContainer;
         DTStoreMessageView messageView;
         DTImageView dtImageView;
     }

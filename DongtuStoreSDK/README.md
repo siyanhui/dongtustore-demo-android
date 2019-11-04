@@ -163,11 +163,11 @@ DongtuStore.loadImageInto(dtImageView, image, id, width, height);
 
 SDK从3.1版本开始提供了表情收藏功能，无论是商店中提供的表情还是搜索UI提供的Gif，都可以由用户加入收藏。开发者只需做两件事请：
 
-* 在需要收藏的时候，调用`collectionHasSticker`、`collectSticker`、`collectionHasGif`、`collectGif`这几个接口；
+* 在需要进行收藏操作的时候，调用`collectionHasSticker`、`collectSticker`、`removeCollectedSticker`、`collectionHasGif`、`collectGif`、`removeCollectedGif`这几个接口；
 
 * 在调用`setUserInfo`时，给每个用户提供一个唯一的UserId。
 
-一个用户收藏的表情可以在键盘中的“收藏”tab查看并发送，在该tab中还有一个收藏管理按钮，点击之后出现的界面中可以对收藏内容进行删除和排序。
+一个用户收藏的表情可以在键盘中的“收藏”tab查看并发送，在该tab中还有一个收藏管理按钮，点击之后可以进入用于对收藏内容进行删除和排序的界面。
 
 ### 7. UI定制
 

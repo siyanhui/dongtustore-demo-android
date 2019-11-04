@@ -1,7 +1,3 @@
-<link rel="stylesheet" href="../../../custom/css/app.css">
-<script src="../../../custom/js/app.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-
 # 类和开放接口
 
 ----------------
@@ -24,7 +20,7 @@ public static void initConfig(Context context, String appId, String appSecret)
 public static void setUserInfo(String userId, String userName, DTGender gender, String address, String email, String phone, JSONObject extra) 
 ```
 
-* 加载SDK功能，和`destroy`对应。
+* 加载SDK功能，和`destroy`对应。对它的调用是可选的。
 
 ```java
 public static void load()
@@ -92,6 +88,12 @@ public static void setGifKeyboardConfigProvider(DTGifKeyboardConfigProvider prov
 public static void setCollectionManagerConfigProvider(DTStoreCollectionManagerConfigProvider provider)
 ```
 
+* 设置状态栏文字颜色。当App启用了沉浸式UI，并且将状态栏的背景设置为浅色时，可以调用此方法，传入true以使状态栏文字变为深色。
+
+```java
+public static void setEnableLightStatusBar(boolean enabled)
+```
+
 * 展示动图
 
 ```java
@@ -116,6 +118,12 @@ public static void collectionHasSticker(String code, CollectionExistsCallback ca
 public static void collectSticker(String code, DTOutcomeListener listener)
 ```
 
+* 移除收藏的商店表情
+
+```java
+public static void removeCollectedSticker(String code, DTOutcomeListener listener)
+```
+
 * 判断动图是否已收藏
 
 ```java
@@ -126,6 +134,12 @@ public static void collectionHasGif(String code, CollectionExistsCallback callba
 
 ```java
 public static void collectGif(String id, DTOutcomeListener listener)
+```
+
+* 移除收藏的动图表情
+
+```java
+public static void removeCollectedGif(String id, DTOutcomeListener listener)
 ```
 
 ## UI定制相关类
