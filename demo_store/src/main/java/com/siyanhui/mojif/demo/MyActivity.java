@@ -1,11 +1,11 @@
 package com.siyanhui.mojif.demo;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 @SuppressLint("ClickableViewAccessibility")
-public class MyActivity extends FragmentActivity {
+public class MyActivity extends Activity {
     List<Message> mMessages = new ArrayList<>();
     private DTStoreKeyboard mKeyboard;
     private View mMainContainer;
@@ -64,7 +64,7 @@ public class MyActivity extends FragmentActivity {
         /*
          * 加载SDK
          */
-        DongtuStore.setKeyboard(findViewById(R.id.chat_msg_input_box));
+        DongtuStore.setKeyboard(mKeyboard);
         DongtuStore.setEditText(mEditText);
         DongtuStore.setupSearchPopupAboveView(findViewById(R.id.messageToolBox), mEditText);
         /*
