@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.siyanhui.mojif.demo"
-    android:versionCode="8"
-    android:versionName="3.2.3">
+    android:versionCode="9"
+    android:versionName="3.2.5">
     <!-- 读写权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- 网络权限 -->
@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 获取MAC地址 -->
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".DemoApplication"
